@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import User
+from django.contrib.auth import authenticate
 
 
 class UserSignUpSerializer(serializers.ModelSerializer) :
@@ -22,3 +23,17 @@ class UserSignUpSerializer(serializers.ModelSerializer) :
               status=validated_data.pop('status')
           )
           return user
+
+
+class UserLoginSerializer(serializers.Serializer) :
+    email =  serializers.CharField(required=True)
+    password = serializers.CharField(required=True)
+
+    def validate(self, attrs):
+        self.user = authenticate(username=attrs.pop("email"),
+                                 password = attrs.pop("password") )
+
+        if self.user:
+            return  attrs
+        else :
+            raise serializers.ValidationError()
