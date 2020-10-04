@@ -1,6 +1,7 @@
-from rest_framework.generics import CreateAPIView, ListAPIView ,GenericAPIView
+from rest_framework import status
+from rest_framework.generics import CreateAPIView, ListAPIView, GenericAPIView, UpdateAPIView
 from rest_framework.response import Response
-from .serializers import UserSignUpSerializer, UserLoginSerializer
+from .serializers import UserSignUpSerializer, UserLoginSerializer, UpdateUserSerializer
 from .models import User
 
 
@@ -59,3 +60,33 @@ class UserLoginAPIView(GenericAPIView):
             return Response(response_data)
         else:
             return Response(serializer.errors)
+
+
+
+
+class UpdateUserAPIView(UpdateAPIView):
+    serializer_class = UpdateUserSerializer
+
+
+    def get_queryset(self):
+        users_id =self.kwargs['pk']
+        return User.objects.filter(id=users_id)
+
+    def patch(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.status = request.data["status"]
+
+    def patch(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.email = request.data["email"]
+
+    def patch(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.username = request.data["username"]
+
+        serializer = self.get_serializer(instance, data=request.data)
+
+        if serializer.is_valid(raise_exception=True):
+             self.partial_update(serializer)
+
+        return Response(serializer.data, status.HTTP_200_OK)

@@ -6,6 +6,7 @@ from users.models import  User
 
 class Blog(models.Model) :
 
+
     Status_Choice =(
         ('DRAFT', 'Draft'),
         ('PUBLISHED','Published')
