@@ -1,7 +1,13 @@
 from rest_framework import status
-from rest_framework.generics import CreateAPIView, ListAPIView, GenericAPIView, UpdateAPIView
+from rest_framework.generics import (CreateAPIView,
+                                     DestroyAPIView,
+                                     ListAPIView,
+                                     GenericAPIView,
+                                     UpdateAPIView)
 from rest_framework.response import Response
-from .serializers import UserSignUpSerializer, UserLoginSerializer, UpdateUserSerializer
+from .serializers import (UserSignUpSerializer,
+                          UserLoginSerializer,
+                          UpdateUserSerializer )
 from .models import User
 
 
@@ -74,15 +80,14 @@ class UpdateUserAPIView(UpdateAPIView):
 
     def patch(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.status = request.data["status"]
+        instance.status = request.data["status"],
+        instance.email = request.data["email"],
+        instance.first_name = request.data["first_name"],
+        instance.last_name = request.data["last_name"],
+        instance.description = request.data["description"],
+        instance.linkedin_url = request.data["linkedin_url"],
+        instance.contact_number= request.data["contact_number"]
 
-    def patch(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.email = request.data["email"]
-
-    def patch(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.username = request.data["username"]
 
         serializer = self.get_serializer(instance, data=request.data)
 
@@ -90,3 +95,11 @@ class UpdateUserAPIView(UpdateAPIView):
              self.partial_update(serializer)
 
         return Response(serializer.data, status.HTTP_200_OK)
+
+
+
+class DeleteUserView(DestroyAPIView) :
+    def delete(self, request, *args, **kwargs):
+        user_id =self.kwargs['pk']
+        User.objects.filter(id=user_id).delete()
+        return  Response(status.HTTP_204_NO_CONTENT)
